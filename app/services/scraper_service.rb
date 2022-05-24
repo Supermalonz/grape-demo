@@ -1,21 +1,21 @@
 # frozen_string_literal: true
 
 class ScraperService
+  def call(word)
+    @word = word
+    driver_init
+    result
+    driver.quit
+  end
+
+  private
+
+  attr_reader :word
   attr_accessor :driver, :doc
-
-  def selenium_options
-    options = Selenium::WebDriver::Chrome::Options.new
-    options.add_argument('--headless')
-    options
-  end
-
-  def selenium_capabilities_chrome
-    Selenium::WebDriver::Remote::Capabilities.chrome
-  end
 
   def driver_init
     @driver = Selenium::WebDriver.for(:chrome, capabilities: [selenium_options, selenium_capabilities_chrome])
-    @driver.get('https://www.google.com/search?hl=en&q=apple')
+    @driver.get("https://www.google.com/search?hl=en&q=#{word}")
   end
 
   def ads_result
@@ -27,6 +27,7 @@ class ScraperService
       }
       ads_array << ads
     end
+    ads_array.reject { |e| e[:header].empty? }
   end
 
   def nonads_result
@@ -38,13 +39,24 @@ class ScraperService
       }
       nonads_array << non_ads
     end
+    nonads_array.reject { |e| e[:header].empty? }
   end
 
   def result
-    @doc = Nokogiri::HTML(driver.page_source)
+    doc = Nokogiri::HTML(driver.page_source)
     {
       ads_result: ads_result,
       nonads_result: nonads_result
     }
+  end
+
+  def selenium_options
+    options = Selenium::WebDriver::Chrome::Options.new
+    options.add_argument('--headless')
+    options
+  end
+
+  def selenium_capabilities_chrome
+    Selenium::WebDriver::Remote::Capabilities.chrome
   end
 end
