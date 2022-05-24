@@ -22,9 +22,18 @@ gem 'grape-swagger', '~> 1.4', '>= 1.4.2'
 gem 'active_model_serializers', '~> 0.10.13'
 # Add Rswag
 gem 'rswag-ui', '~> 2.5', '>= 2.5.1' # rails g rswag:ui:install
-
+# Add sidekig
+gem 'sidekiq', '~> 6.4', '>= 6.4.2'
 #Add pry
 gem 'pry', '~> 0.14.1'
+#Add redis
+gem 'redis', '~> 4.6'
+#Add dotenv
+gem 'dotenv', '~> 2.7', '>= 2.7.6'
+# Add CSV reader
+gem 'smarter_csv', '~> 1.6', '>= 1.6.1'
+
+gem 'selenium-webdriver', '~> 4.1'
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"
 

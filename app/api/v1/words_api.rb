@@ -28,7 +28,6 @@ module V1
       post do
         word = Word.new(word_params)
         if word.save
-          binding.pry
           render_json(:ok, WordSerializer.new(word).as_json)
         else
           error!({ error: word.errors.full_messages }, 422)
