@@ -13,9 +13,7 @@ module V1
     end
 
     helpers V1::Helpers::ResponseHelper
-    # helpers V1::Helpers::SharedSetterMethods
 
-    mount V1::HelloWorldAPI
     mount V1::WordsAPI
 
     add_swagger_documentation(
