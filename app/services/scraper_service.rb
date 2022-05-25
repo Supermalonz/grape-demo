@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
 class ScraperService
+  include Singleton
+
   def call(word)
     @word = word
     driver_init
     result
+    store_result
     driver.quit
   end
 
@@ -43,7 +46,7 @@ class ScraperService
   end
 
   def result
-    doc = Nokogiri::HTML(driver.page_source)
+    @doc = Nokogiri::HTML(driver.page_source)
     {
       ads_result: ads_result,
       nonads_result: nonads_result
@@ -58,5 +61,20 @@ class ScraperService
 
   def selenium_capabilities_chrome
     Selenium::WebDriver::Remote::Capabilities.chrome
+  end
+
+  def store_result
+    keyword = Keyword.new(title: word)
+    return unless keyword.save
+
+    ads_result.each do |ads|
+      ads = ads.deep_symbolize_keys
+      SearchResult.create(header: ads[:header], url: ads[:url], is_ads: true, keyword: keyword)
+    end
+
+    nonads_result.each do |nonads|
+      nonads = nonads.deep_symbolize_keys
+      SearchResult.create(header: nonads[:header], url: nonads[:url], is_ads: false, keyword: keyword)
+    end
   end
 end

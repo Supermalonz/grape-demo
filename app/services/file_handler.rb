@@ -1,7 +1,14 @@
-class FileService
+# frozen_string_literal: true
+class FileHandler
   def self.import(file)
-    SmarterCSV.process(file.path) do |element|
-      ScraperService.perform_async(element.map { |e| e[:keyword]})
+    i = 0
+    SmarterCSV.process(file).each do |row|
+      if i == 10
+        sleep rand(1..15)
+        i = 0
+      end
+      ScraperWorker.perform_async(row[:title])
+      i += 1
     end
   end
 end
