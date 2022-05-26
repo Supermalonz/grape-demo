@@ -7,11 +7,10 @@ module V1
         summary 'Get word that contains Adwords the most'
       end
       get :adswords do
-        pivot = {}
         keywords = Keyword.all
-        keywords.each do |keyword|
+        pivot = keywords.each_with_object({}) do |keyword, hash|
           key_id = keyword.title.to_sym
-          pivot[key_id] = SearchResult.where(is_ads: true).where(keyword_id: keyword.id).count
+          hash[key_id] = SearchResult.where(is_ads: true).where(keyword_id: keyword.id).size
         end
         key_result = pivot.key(pivot.values.max)
         value_result = pivot[pivot.key(pivot.values.max)]
@@ -49,11 +48,8 @@ module V1
         optional :query, type: String, desc: 'Query string'
       end
       get :contains do
-        count = 0
-        SearchResult.all.each do |row|
-          count += 1 if row.url.include? params[:query]
-        end
-        render_json(:ok, "#{params[:query]} : #{count}")
+        result = SearchResult.where("url LIKE '%#{params[:query]}%'").size
+        render_json(:ok, "#{params[:query]} : #{result}")
       end
 
       desc 'Post /api/v1/keywords/csv' do
