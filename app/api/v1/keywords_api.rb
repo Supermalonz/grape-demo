@@ -2,13 +2,6 @@
 
 module V1
   class KeywordsAPI < Grape::API
-    helpers do
-      # def keyword_params
-      #   params.slice(
-      #     :title
-      #   )
-      # end
-    end
 
     namespace :keywords do
       desc 'Get /api/v1/keywords/all' do
@@ -39,11 +32,15 @@ module V1
         summary 'Post CSV file'
       end
       params do
-        requires :csv, type: Rack::Multipart::UploadedFile, desc: 'CSV file'
+        requires :csv, type: File, desc: 'CSV file'
       end
       post :csv do
         file = ActionDispatch::Http::UploadedFile.new(params[:csv])
-        return FileService.find_control(file) unless FileHandler.import(file)
+        FileService.file_control(file)
+        FileHandler.import(file)
+        render_json(:ok, 'Upload Success')
+      rescue FileService::FileTooBigError,  FileService::FileTypeError, FileService::FileEmptyError => e
+        error!(e, 422)
       end
     end
   end
