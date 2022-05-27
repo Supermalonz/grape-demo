@@ -21,6 +21,15 @@ describe KeywordsAPI do
       end
     end
 
+    describe 'Get /api/v1/keywords/all' do
+      it 'Get ads result' do
+        get "/api/v1/keywords/ads"
+        # last_response.status.should == 200
+        # JSON.parse(last_response.body)["hello"].should == "world"
+        expect(response.status).to eq(200)
+      end
+    end
+
     # describe 'Post /api/v1/keywords/csv' do
     #   it 'Get CSV from user and scrape from google' do
     #   end
