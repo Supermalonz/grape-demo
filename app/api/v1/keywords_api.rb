@@ -10,7 +10,7 @@ module V1
         keywords = Keyword.all
         pivot = keywords.each_with_object({}) do |keyword, hash|
           key_id = keyword.title.to_sym
-          hash[key_id] = SearchResult.where(is_ads: true).where(keyword_id: keyword.id).size
+          hash[key_id] = SearchResult.where(is_ads: true, keyword_id: keyword.id).size
         end
         key_result = pivot.key(pivot.values.max)
         value_result = pivot[pivot.key(pivot.values.max)]
@@ -63,7 +63,7 @@ module V1
         FileService.file_control(file)
         FileHandler.import(file)
         render_json(:ok, 'Upload Success')
-      rescue FileService::FileTooBigError,  FileService::FileTypeError, FileService::FileEmptyError => e
+      rescue FileService::FileTooBigError, FileService::FileTypeError, FileService::FileEmptyError => e
         error!(e, 422)
       end
     end
