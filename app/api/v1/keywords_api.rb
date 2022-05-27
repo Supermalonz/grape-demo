@@ -22,7 +22,16 @@ module V1
       end
       get :all do
         result = SearchResult.all
-        render_json(:ok, result.as_json)
+        meta = {
+          'Number of Records': result.size,
+          'Number of Ads': result.where(is_ads: true).size,
+          'Number of Non-Ads': result.where(is_ads: false).size
+        }
+        data = {
+          data: ActiveModelSerializers::SerializableResource.new(result, each_serializer: SearchResultSerializer).to_json,
+          meta: meta
+        }
+        render_json(:ok, data)
       end
 
       desc 'Get /api/v1/keywords/ads' do
@@ -30,7 +39,14 @@ module V1
       end
       get :ads do
         result = SearchResult.where(is_ads: true)
-        render_json(:ok, result.as_json)
+        meta = {
+          'Number of Ads': result.where(is_ads: true).size,
+        }
+        data = {
+          data: ActiveModelSerializers::SerializableResource.new(result, each_serializer: SearchResultSerializer).to_json,
+          meta: meta
+        }
+        render_json(:ok, data)
       end
 
       desc 'Get /api/v1/keywords/non_ads' do
@@ -38,7 +54,14 @@ module V1
       end
       get :non_ads do
         result = SearchResult.where(is_ads: false)
-        render_json(:ok, result.as_json)
+        meta = {
+          'Number of Non-Ads': result.where(is_ads: false).size
+        }
+        data = {
+          data: ActiveModelSerializers::SerializableResource.new(result, each_serializer: SearchResultSerializer).to_json,
+          meta: meta
+        }
+        render_json(:ok, data)
       end
 
       desc 'Get /api/v1/keywords/contains' do
