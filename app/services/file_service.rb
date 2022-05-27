@@ -19,7 +19,7 @@ class FileService
 
   def self.file_control(file)
     raise FileEmptyError if file.blank?
+    raise FileTypeError unless File.extname(file) == '.csv'
     raise FileTooBigError if IO.readlines(file).size > MAX_ROWS
-    raise FileTypeError unless File.extname(file).include? %w[.csv]
   end
 end

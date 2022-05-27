@@ -14,7 +14,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_25_022216) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "key_words", force: :cascade do |t|
+  create_table "keywords", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -23,18 +23,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_25_022216) do
   create_table "search_results", force: :cascade do |t|
     t.string "header"
     t.string "url"
-    t.bigint "key_words_id", null: false
+    t.bigint "keyword_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_ads"
-    t.index ["key_words_id"], name: "index_search_results_on_key_words_id"
+    t.index ["keyword_id"], name: "index_search_results_on_keyword_id"
   end
 
-  create_table "words", force: :cascade do |t|
-    t.string "title", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  add_foreign_key "search_results", "key_words", column: "key_words_id"
+  add_foreign_key "search_results", "keywords"
 end

@@ -14,7 +14,7 @@ module V1
 
     helpers V1::Helpers::ResponseHelper
 
-    mount V1::WordsAPI
+    mount V1::KeywordsAPI
 
     add_swagger_documentation(
       api_version: 'v1',
