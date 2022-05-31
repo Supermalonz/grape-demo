@@ -15,9 +15,9 @@ RSpec.describe V1::KeywordsAPI, type: :api do
     end
 
     it 'return all data' do
-      json_results = JSON.parse(ActiveModelSerializers::SerializableResource.new(SearchResult.all, each_serializer: SearchResultSerializer).to_json)
-      call_body = JSON.parse(JSON.parse(call.body)['data'])
-      expect(call_body).to match_array json_results
+      json_results = ActiveModelSerializers::SerializableResource.new(SearchResult.all, each_serializer: SearchResultSerializer).to_json
+      call_body = JSON.parse(call.body)['data']
+      expect(call_body).to eq json_results
     end
   end
 
@@ -38,9 +38,9 @@ RSpec.describe V1::KeywordsAPI, type: :api do
     end
 
     it 'check returned data' do
-      json_results = JSON.parse(ActiveModelSerializers::SerializableResource.new(search_result_b, each_serializer: SearchResultSerializer).to_json)
-      call_body = JSON.parse(JSON.parse(call.body)['data'])[0]
-      expect(call_body).to match_array json_results
+      json_results = ActiveModelSerializers::SerializableResource.new(SearchResult.where(is_ads: true), each_serializer: SearchResultSerializer).to_json
+      call_body = JSON.parse(call.body)['data']
+      expect(call_body).to eq json_results
     end
   end
 
@@ -50,9 +50,9 @@ RSpec.describe V1::KeywordsAPI, type: :api do
     end
 
     it 'check returned data' do
-      json_results = JSON.parse(ActiveModelSerializers::SerializableResource.new(search_result_a, each_serializer: SearchResultSerializer).to_json)
-      call_body = JSON.parse(JSON.parse(call.body)['data'])[0]
-      expect(call_body).to match_array json_results
+      json_results = ActiveModelSerializers::SerializableResource.new(SearchResult.where(is_ads: false), each_serializer: SearchResultSerializer).to_json
+      call_body = JSON.parse(call.body)['data']
+      expect(call_body).to eq json_results
     end
   end
 
@@ -70,8 +70,6 @@ RSpec.describe V1::KeywordsAPI, type: :api do
   describe 'POST /keywords/csv' do
     let(:file) { fixture_file_upload('/keywords.csv') }
     let(:valid_file) { fixture_file_upload('/none-csv-file.png') }
-    let(:too_big_file) { fixture_file_upload('/too-big-file.csv') }
-    let(:empty_file) { fixture_file_upload('/empty-csv-file.csv') }
 
     it 'return status 200 if upload csv files' do
       params[:csv] = file
@@ -88,14 +86,15 @@ RSpec.describe V1::KeywordsAPI, type: :api do
     end
 
     it 'CSV has more than 1000 rows' do
-      params[:csv] = too_big_file
+      allow(FileService).to receive(:file_control).and_raise(FileService::FileTooBigError)
+      params[:csv] = file
       expect(JSON.parse(call.body)['error']).to eq 'FileService::FileTooBigError'
     end
 
     it 'empty CSV file' do
-      params[:csv] = empty_file
+      allow(FileService).to receive(:file_control).and_raise(FileService::FileEmptyError)
+      params[:csv] = file
       expect(JSON.parse(call.body)['error']).to eq 'FileService::FileEmptyError'
     end
-    #If inserting empty csv file, it will get error. Fixing on it
   end
 end
