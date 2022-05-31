@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe FileHandlerWorker, type: :worker do
   describe 'sidekiq_options' do
     it { is_expected.to be_processed_in :default }
-    it { is_expected.to be_retryable 10 }
+    it { is_expected.to be_retryable 0 }
   end
 
   describe '#perform' do
