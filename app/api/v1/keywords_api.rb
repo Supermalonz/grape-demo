@@ -21,6 +21,7 @@ module V1
         summary 'Get all result'
       end
       get :all do
+
         result = SearchResult.all
         meta = {
           'Number of Records': result.size,
