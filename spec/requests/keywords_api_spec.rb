@@ -71,30 +71,50 @@ RSpec.describe V1::KeywordsAPI, type: :api do
     let(:file) { fixture_file_upload('/keywords.csv') }
     let(:valid_file) { fixture_file_upload('/none-csv-file.png') }
 
-    it 'return status 200 if upload csv files' do
-      params[:csv] = file
-      expect(call.status).to eq 200
-    end
-
     it 'empty file' do
       expect(JSON.parse(call.body)['error']).to eq 'csv is missing'
     end
 
-    it 'invalid file type : rescure message' do
-      params[:csv] = valid_file
-      expect(JSON.parse(call.body)['error']).to eq 'FileService::FileTypeError'
+    context 'with valid params' do
+      let(:params) { { csv: file } }
+
+      before do
+        allow(ActionDispatch::Http::UploadedFile).to receive(:new).and_return(file)
+        allow(FileService).to receive(:file_control)
+        allow(FileHandler).to receive(:import)
+      end
+      it 'return status 200 if upload csv files' do
+        expect(call.status).to eq 200
+      end
+
+      it 'calls file_control' do
+        call
+        expect(FileService).to have_received(:file_control).with(file)
+      end
+
+      it 'import file' do
+        call
+        expect(FileHandler).to have_received(:import).with(file)
+      end
     end
 
-    it 'CSV has more than 1000 rows' do
-      allow(FileService).to receive(:file_control).and_raise(FileService::FileTooBigError)
-      params[:csv] = file
-      expect(JSON.parse(call.body)['error']).to eq 'FileService::FileTooBigError'
-    end
+    context 'file errors' do
+      let(:params) { { csv: file } }
 
-    it 'empty CSV file' do
-      allow(FileService).to receive(:file_control).and_raise(FileService::FileEmptyError)
-      params[:csv] = file
-      expect(JSON.parse(call.body)['error']).to eq 'FileService::FileEmptyError'
+      it 'invalid file type : rescure message' do
+        allow(FileService).to receive(:file_control).and_raise(FileService::FileTypeError)
+        expect(JSON.parse(call.body)['error']).to eq 'FileService::FileTypeError'
+      end
+
+      it 'CSV has more than 1000 rows' do
+        allow(FileService).to receive(:file_control).and_raise(FileService::FileTooBigError)
+        expect(JSON.parse(call.body)['error']).to eq 'FileService::FileTooBigError'
+      end
+
+      it 'empty CSV file' do
+        allow(FileService).to receive(:file_control).and_raise(FileService::FileEmptyError)
+        expect(JSON.parse(call.body)['error']).to eq 'FileService::FileEmptyError'
+      end
     end
   end
 end
