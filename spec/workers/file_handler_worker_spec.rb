@@ -2,17 +2,19 @@
 
 require 'rails_helper'
 
-RSpec.describe ScraperWorker, type: :worker do
+RSpec.describe FileHandlerWorker, type: :worker do
   describe 'sidekiq_options' do
     it { is_expected.to be_processed_in :default }
     it { is_expected.to be_retryable 10 }
   end
 
   describe '#perform' do
-    subject(:perform) { described_class.new.perform(word) }
-    let(:word)  { 'Apple' }
+    subject(:perform) { described_class.new.perform(file) }
+
+    let(:file) { fixture_file_upload('/keywords.csv') }
+
     it 'import file' do
-      allow(ScraperService.instance).to receive(:call).with(word)
+      allow(FileHandler).to receive(:import).with(file)
     end
   end
 end
