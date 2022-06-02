@@ -6,23 +6,25 @@ class ScraperService
   def call(word)
     @word = word
     driver_init
-    result
+    search_result = result
     store_result
     driver.quit
+
+    search_result
   end
 
   private
 
   attr_reader :word
-  attr_accessor :driver, :doc
+  attr_accessor :driver, :doc, :serarch_result
 
   def driver_init
     @driver = Selenium::WebDriver.for(:chrome, capabilities: [selenium_options, selenium_capabilities_chrome])
-    @driver.get("https://www.google.com/search?hl=en&q=#{word}")
+    @driver.get("https://www.google.com/search?q=#{word}")
   end
 
   def ads_result
-    ads_array = Array.new
+    ads_array = []
     ads_listings = doc.css('div#tads').each do |ads_listing|
       ads = {
         header: ads_listing.css('div a span').first.text,
@@ -34,7 +36,7 @@ class ScraperService
   end
 
   def nonads_result
-    nonads_array = Array.new
+    nonads_array = []
     nonads_listings = doc.css('div.g').each do |nonads_listing|
       non_ads = {
         header: nonads_listing.css('h3').text,

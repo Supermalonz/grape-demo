@@ -28,6 +28,8 @@ group :development, :test do
   gem 'rspec-grape', '~> 0.0.4'
   gem 'factory_bot_rails', '~> 6.2'
   gem 'shoulda-matchers', '~> 5.1'
+  gem 'vcr', '~> 6.1'
+  gem 'webmock', '~> 3.14'
 end
 
 group :development do
