@@ -16,7 +16,7 @@ class ScraperService
   private
 
   attr_reader :word
-  attr_accessor :driver, :doc, :serarch_result
+  attr_accessor :driver, :doc
 
   def driver_init
     @driver = Selenium::WebDriver.for(:chrome, capabilities: [selenium_options, selenium_capabilities_chrome])
