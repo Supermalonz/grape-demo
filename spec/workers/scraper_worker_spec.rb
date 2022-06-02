@@ -10,8 +10,10 @@ RSpec.describe ScraperWorker, type: :worker do
 
   describe '#perform' do
     subject(:perform) { described_class.new.perform(word) }
+
     let(:word)  { 'Apple' }
-    it 'import file' do
+
+    it 'import word' do
       allow(ScraperService.instance).to receive(:call).with(word)
     end
   end
